@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baca Data Excel</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h3 class="mb-4">Baca Data Excel</h3>
+        <form>
+            <div class="form-group">
+                <label for="excelFile">Pilih file Excel</label>
+                <input type="file" class="form-control-file" id="excelFile" accept=".xls, .xlsx">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="readExcel()">Baca Excel</button>
+        </form>
+
+        <div id="excelTableContainer" class="mt-5">
+            <h4>Hasil Baca Excel</h4>
+            <table id="excelTable" class="table table-bordered table-striped">
+                <!-- Tabel hasil akan ditampilkan di sini -->
+            </table>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+
+    <script>
+        function readExcel() {
+            var fileInput = document.getElementById('excelFile');
+            var excelTableContainer = document.getElementById('excelTableContainer');
+            var excelTable = document.getElementById('excelTable');
+
+            var file = fileInput.files[0];
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                var data = e.target.result;
+                var workbook = XLSX.read(data, { type: 'binary' });
+
+                var sheetName = workbook.SheetNames[0];
+                var sheet = workbook.Sheets[sheetName];
+
+                // Hapus DataTable sebelumnya (jika ada)
+                if ($.fn.DataTable.isDataTable('#excelTable')) {
+                    $('#excelTable').DataTable().destroy();
+                }
+
+                // Convert the sheet data to an array of objects
+                var jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                // Get the header row
+                var headers = jsonData[0];
+
+                // Remove the header row from the data
+                jsonData.shift();
+
+                // Create HTML for table header
+                var theadHtml = '<thead><tr>';
+                for (var i = 0; i < headers.length; i++) {
+                    theadHtml += '<th>' + headers[i] + '</th>';
+                }
+                theadHtml += '</tr></thead>';
+
+                // Create HTML for table body
+                var tbodyHtml = '<tbody>';
+                for (var i = 0; i < jsonData.length; i++) {
+                    if (jsonData[i][0] !== undefined) { // Check if data at column 1 is not undefined
+                        tbodyHtml += '<tr>';
+                        for (var j = 0; j < headers.length; j++) {
+                            tbodyHtml += '<td>' + (jsonData[i][j] !== undefined ? jsonData[i][j] : '') + '</td>';
+                        }
+                        tbodyHtml += '</tr>';
+                    }
+                }
+                tbodyHtml += '</tbody>';
+
+                // Combine the HTML and append to the table
+                excelTable.innerHTML = theadHtml + tbodyHtml;
+
+                excelTableContainer.style.display = 'block';
+
+                // Initialize DataTable with pagination and searching
+                $('#excelTable').DataTable({
+                    paging: true,
+                    searching: true
+                });
+            };
+
+            reader.readAsBinaryString(file);
+        }
+    </script>
+</body>
+</html>
