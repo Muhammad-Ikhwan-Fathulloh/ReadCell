@@ -6,6 +6,7 @@
     <title>Baca Data Excel</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
 </head>
 <body>
     <div class="container mt-5">
@@ -33,6 +34,7 @@
     <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
 
     <script>
         function readExcel() {
@@ -69,16 +71,21 @@
                 for (var i = 0; i < headers.length; i++) {
                     theadHtml += '<th>' + headers[i] + '</th>';
                 }
+                theadHtml += '<th>Validasi</th>'; // Kolom validasi
                 theadHtml += '</tr></thead>';
 
                 // Create HTML for table body
                 var tbodyHtml = '<tbody>';
                 for (var i = 0; i < jsonData.length; i++) {
-                    if (jsonData[i][0] !== undefined) { // Check if data at column 1 is not undefined
+                    if (jsonData[i][0] !== undefined) {
                         tbodyHtml += '<tr>';
                         for (var j = 0; j < headers.length; j++) {
                             tbodyHtml += '<td>' + (jsonData[i][j] !== undefined ? jsonData[i][j] : '') + '</td>';
                         }
+
+                        // Kolom validasi dengan switch button
+                        tbodyHtml += '<td><input type="checkbox" class="validationSwitch" data-row="' + i + '" data-on-text="Valid" data-off-text="Tidak Valid"></td>';
+
                         tbodyHtml += '</tr>';
                     }
                 }
@@ -90,13 +97,34 @@
                 excelTableContainer.style.display = 'block';
 
                 // Initialize DataTable with pagination and searching
-                $('#excelTable').DataTable({
+                var dataTable = $('#excelTable').DataTable({
                     paging: true,
-                    searching: true
+                    searching: true,
+                    drawCallback: function () {
+                        // Inisialisasi Bootstrap Switch untuk setiap switch button
+                        $('.validationSwitch').bootstrapSwitch();
+
+                        // Tambahkan event listener untuk perubahan status switch button
+                        $('.validationSwitch').on('switchChange.bootstrapSwitch', function (event, state) {
+                            var rowIdx = $(this).data('row');
+                            updateValidationStatus(rowIdx, state);
+                        });
+                    }
                 });
             };
 
             reader.readAsBinaryString(file);
+        }
+
+        function updateValidationStatus(rowIdx, isValid) {
+            var dataTable = $('#excelTable').DataTable();
+            var rowNode = dataTable.row(rowIdx).node();
+
+            if (isValid) {
+                $(rowNode).addClass('table-success').removeClass('table-danger');
+            } else {
+                $(rowNode).addClass('table-danger').removeClass('table-success');
+            }
         }
     </script>
 </body>
