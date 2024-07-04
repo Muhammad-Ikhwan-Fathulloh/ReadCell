@@ -32,8 +32,8 @@
   <div class="navbar navbar-dark bg-dark shadow-sm">
     <div class="container d-flex justify-content-between">
       <a href="#" class="navbar-brand d-flex align-items-center">
-        <strong><\> Readcell</strong>
-      </a>
+        <strong><\> Readcell </strong>
+      </a> 
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -52,8 +52,19 @@
             <button type="button" class="btn btn-danger" onclick="clearData()">Hapus Data</button>
         </form>
 
-        <div id="excelTableContainer" class="mt-5">
+        <div id="excelTableContainer" class="mt-5" style="display: none;">
             <h4>Hasil Baca Excel</h4>
+            <div id="countContainer" class="mt-3">
+                <h5>Hasil Validasi:</h5>
+                <div class="row">
+                    <div class="col">
+                        <p>Valid: <h1 id="validCount">0</h1></p>
+                    </div>
+                    <div class="col">
+                        <p>Tidak Valid: <h1 id="invalidCount">0</h1></p>
+                    </div>
+                </div>
+            </div>
             <table id="excelTable" class="table table-bordered table-striped">
                 <!-- Tabel hasil akan ditampilkan di sini -->
             </table>
@@ -70,10 +81,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
 
     <script>
-        $(document).ready(function(){
+        $(document).ready(function() {
             // Check if there's data in local storage
             var savedData = localStorage.getItem('excelData');
-            if(savedData){
+            if (savedData) {
                 $("#excelTable").html(savedData);
                 $("#excelTableContainer").show();
                 // Initialize DataTable with pagination and searching
@@ -179,14 +190,34 @@
             // Simpan status validasi ke dalam localStorage
             localStorage.setItem(localStorageKey, isValid ? 'valid' : 'invalid');
 
-            var dataTable = $('#excelTable').DataTable();
-            var rowNode = dataTable.row(rowIdx).node();
+            // Hitung kembali data valid dan tidak valid
+            countValidationStatus();
         }
 
         // Mendapatkan status validasi dari localStorage untuk setiap baris
         function getStatusFromLocalStorage(rowIdx) {
             var localStorageKey = 'excelData_' + rowIdx;
             return localStorage.getItem(localStorageKey);
+        }
+
+        // Menghitung data valid dan tidak valid dari seluruh data
+        function countValidationStatus() {
+            var validCount = 0;
+            var invalidCount = 0;
+
+            var table = $('#excelTable').DataTable();
+            var rows = table.rows().nodes();
+
+            $(rows).find('.validationSwitch').each(function() {
+                if ($(this).bootstrapSwitch('state')) {
+                    validCount++;
+                } else {
+                    invalidCount++;
+                }
+            });
+
+            $('#validCount').text(validCount);
+            $('#invalidCount').text(invalidCount);
         }
 
         // Draw callback function untuk DataTable
@@ -209,12 +240,17 @@
                     $(this).bootstrapSwitch('state', false, true);
                 }
             });
+
+            // Hitung data valid dan tidak valid saat load awal
+            countValidationStatus();
         }
 
-        function clearData(){
+        function clearData() {
             localStorage.clear();
             $("#excelTableContainer").hide();
             $("#excelTable").html('');
+            $('#validCount').text(0);
+            $('#invalidCount').text(0);
         }
     </script>
 </body>
