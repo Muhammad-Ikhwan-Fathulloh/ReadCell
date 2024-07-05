@@ -50,6 +50,7 @@
             </div>
             <button type="button" class="btn btn-primary" onclick="readExcel()">Baca Excel</button>
             <button type="button" class="btn btn-danger" onclick="clearData()">Hapus Data</button>
+            <button type="button" class="btn btn-success" onclick="exportExcel()">Export Excel</button>
         </form>
 
         <div id="excelTableContainer" class="mt-5" style="display: none;">
@@ -251,6 +252,29 @@
             $("#excelTable").html('');
             $('#validCount').text(0);
             $('#invalidCount').text(0);
+        }
+
+        function exportExcel() {
+            var table = $('#excelTable').DataTable();
+            var data = table.rows().data().toArray();
+
+            var headers = table.columns().header().toArray().map(function(header) {
+                return header.innerText;
+            });
+
+            var exportData = [];
+            exportData.push(headers);
+
+            data.forEach(function(row, index) {
+                var rowData = Array.from(row);
+                rowData.push($(row).find('.validationSwitch').bootstrapSwitch('state') ? 'Valid' : 'Tidak Valid');
+                exportData.push(rowData);
+            });
+
+            var ws = XLSX.utils.aoa_to_sheet(exportData);
+            var wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+            XLSX.writeFile(wb, "Data_Validasi.xlsx");
         }
     </script>
 </body>
