@@ -9,38 +9,39 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css">
 </head>
-<header>
-  <div class="collapse bg-dark" id="navbarHeader">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-8 col-md-7 py-4">
-          <h4 class="text-white">About</h4>
-          <p class="text-muted">Readcell merupakan sistem pendataan untuk kehadiran maupun presensi dari data excel dengan cara import data, serta disimpan pada sisi client agar saat terjadi refresh browser data tidak hilang.</p>
-        </div>
-        <div class="col-sm-4 offset-md-1 py-4">
-          <h4 class="text-white">Contact</h4>
-          <ul class="list-unstyled">
-            <li><a href="https://ikhwanfathulloh.netlify.app/" class="text-white">Portofolio</a></li>
-            <li><a href="https://www.instagram.com/ikhwan_fathulloh" class="text-white">Instagram</a></li>
-            <li><a href="https://www.linkedin.com/in/muhammad-ikhwan-fathulloh/" class="text-white">Linkedin</a></li>
-            <li><a href="https://www.youtube.com/@ikhwanfathulloh" class="text-white">Youtube</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="navbar navbar-dark bg-dark shadow-sm">
-    <div class="container d-flex justify-content-between">
-      <a href="#" class="navbar-brand d-flex align-items-center">
-        <strong><\> Readcell </strong>
-      </a> 
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-    </div>
-  </div>
-</header>
 <body>
+    <header>
+        <div class="collapse bg-dark" id="navbarHeader">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8 col-md-7 py-4">
+                        <h4 class="text-white">About</h4>
+                        <p class="text-muted">Readcell merupakan sistem pendataan untuk kehadiran maupun presensi dari data excel dengan cara import data, serta disimpan pada sisi client agar saat terjadi refresh browser data tidak hilang.</p>
+                    </div>
+                    <div class="col-sm-4 offset-md-1 py-4">
+                        <h4 class="text-white">Contact</h4>
+                        <ul class="list-unstyled">
+                            <li><a href="https://ikhwanfathulloh.netlify.app/" class="text-white">Portofolio</a></li>
+                            <li><a href="https://www.instagram.com/ikhwan_fathulloh" class="text-white">Instagram</a></li>
+                            <li><a href="https://www.linkedin.com/in/muhammad-ikhwan-fathulloh/" class="text-white">Linkedin</a></li>
+                            <li><a href="https://www.youtube.com/@ikhwanfathulloh" class="text-white">Youtube</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navbar navbar-dark bg-dark shadow-sm">
+            <div class="container d-flex justify-content-between">
+                <a href="#" class="navbar-brand d-flex align-items-center">
+                    <strong><\> Readcell </strong>
+                </a> 
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarHeader" aria-controls="navbarHeader" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
     <div class="container mt-5">
         <h3 class="mb-4">Baca Data Excel</h3>
         <form>
@@ -49,7 +50,7 @@
                 <input type="file" class="form-control-file" id="excelFile" accept=".xls, .xlsx">
             </div>
             <button type="button" class="btn btn-primary" onclick="readExcel()">Baca Excel</button>
-            <button type="button" class="btn btn-danger" onclick="clearData()">Hapus Data</button>
+            <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deleteModal">Hapus Data</button>
             <button type="button" class="btn btn-success" onclick="exportExcel()">Export Excel</button>
         </form>
 
@@ -66,9 +67,39 @@
                     </div>
                 </div>
             </div>
+            <div id="excelTableFilters" class="mb-3">
+                <label for="filterValidation">Filter Status Validasi:</label>
+                <select id="filterValidation" class="form-control">
+                    <option value="">Pilih</option>
+                    <option value="all">Semua</option>
+                    <option value="valid">Valid</option>
+                    <option value="invalid">Tidak Valid</option>
+                </select>
+            </div>
             <table id="excelTable" class="table table-bordered table-striped">
                 <!-- Tabel hasil akan ditampilkan di sini -->
             </table>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Konfirmasi Hapus Data</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menghapus semua data?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-danger" onclick="clearData()" data-dismiss="modal">Hapus</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -94,6 +125,9 @@
                     searching: true,
                     drawCallback: drawCallbackFunction
                 });
+
+                // Count validation status on page load
+                countValidationStatus();
             }
         });
 
@@ -147,6 +181,10 @@
                         tbodyHtml += '<td><input type="checkbox" class="validationSwitch" data-row="' + i + '" data-on-text="Valid" data-off-text="Tidak Valid"></td>';
 
                         tbodyHtml += '</tr>';
+
+                        // Simpan status invalid ke dalam localStorage untuk setiap baris
+                        var localStorageKey = 'excelData_' + i;
+                        localStorage.setItem(localStorageKey, 'invalid');
                     }
                 }
                 tbodyHtml += '</tbody>';
@@ -165,6 +203,9 @@
 
                 // Save data to local storage
                 localStorage.setItem('excelData', theadHtml + tbodyHtml);
+
+                // Count validation status
+                countValidationStatus();
             };
 
             reader.readAsBinaryString(file);
@@ -201,22 +242,25 @@
             return localStorage.getItem(localStorageKey);
         }
 
-        // Menghitung data valid dan tidak valid dari seluruh data
+        // Function to count validation status from both localStorage and DataTable
         function countValidationStatus() {
             var validCount = 0;
             var invalidCount = 0;
 
-            var table = $('#excelTable').DataTable();
-            var rows = table.rows().nodes();
-
-            $(rows).find('.validationSwitch').each(function() {
-                if ($(this).bootstrapSwitch('state')) {
-                    validCount++;
-                } else {
-                    invalidCount++;
+            // Iterate through localStorage keys
+            for (var i = 0; i < localStorage.length; i++) {
+                var key = localStorage.key(i);
+                if (key.startsWith('excelData_')) {
+                    var status = localStorage.getItem(key);
+                    if (status === 'valid') {
+                        validCount++;
+                    } else if (status === 'invalid') {
+                        invalidCount++;
+                    }
                 }
-            });
+            }
 
+            // Update counts in the UI
             $('#validCount').text(validCount);
             $('#invalidCount').text(invalidCount);
         }
@@ -224,6 +268,37 @@
         // Draw callback function untuk DataTable
         function drawCallbackFunction() {
             initBootstrapSwitch();
+
+            // Tambahkan dropdown filter
+            var filterHtml = '<label for="filterValidation">Filter Status Validasi:</label>';
+            filterHtml += '<select id="filterValidation" class="form-control">';
+            filterHtml += '<option value="">Pilih</option>';
+            filterHtml += '<option value="all">Semua</option>';
+            filterHtml += '<option value="valid">Valid</option>';
+            filterHtml += '<option value="invalid">Tidak Valid</option>';
+            filterHtml += '</select>';
+
+            $('#excelTableFilters').html(filterHtml);
+
+            // Mendengarkan perubahan filter
+            $('#filterValidation').on('change', function() {
+                var status = $(this).val();
+
+                // Reset filter pada DataTable
+                $.fn.dataTable.ext.search.pop(); // hapus filter sebelumnya
+                if (status === 'valid') {
+                    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                        return getStatusFromLocalStorage(dataIndex) === 'valid';
+                    });
+                } else if (status === 'invalid') {
+                    $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                        return getStatusFromLocalStorage(dataIndex) === 'invalid';
+                    });
+                }
+
+                // Terapkan filter dan gambar ulang DataTable
+                $('#excelTable').DataTable().draw();
+            });
 
             // Tambahkan event listener untuk perubahan status switch button
             $('.validationSwitch').on('switchChange.bootstrapSwitch', function (event, state) {
